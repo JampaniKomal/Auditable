@@ -17,3 +17,4 @@ scenarios/*/logs/*
 !scenarios/*/logs/.gitkeep
 scenarios/*/nginx/certs/*
 !scenarios/*/nginx/certs/.gitkeep
+scenarios/*/src/node_modules/
