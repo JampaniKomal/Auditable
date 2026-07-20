@@ -18,3 +18,5 @@ scenarios/*/logs/*
 scenarios/*/nginx/certs/*
 !scenarios/*/nginx/certs/.gitkeep
 scenarios/*/src/node_modules/
+scenarios/*/elasticsearch/data/*
+!scenarios/*/elasticsearch/data/.gitkeep

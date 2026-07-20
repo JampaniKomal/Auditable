@@ -7,9 +7,10 @@ This monorepo allows security researchers, compliance auditors, and developers t
 ## Current Scenarios
 *   **01-Fintech-Startup:** A Python/PostgreSQL microservice environment containing severe data-at-rest vulnerabilities, hardcoded secrets, and DPDPA privacy violations.
 *   **02-Legacy-Enterprise:** A Node.js/MySQL portal with deprecated TLS settings, outdated logging dependencies, hardcoded client-side secrets, and raw audit logging.
+*   **03-Healthcare-Data-Broker:** An ELK-backed medical telemetry broker with an exposed Docker socket and disconnected webhook reporting.
 
 ## How to Use
-1. Navigate to a scenario directory (e.g., `cd scenarios/01-fintech-startup` or `cd scenarios/02-legacy-enterprise`).
+1. Navigate to a scenario directory (e.g., `cd scenarios/01-fintech-startup`, `cd scenarios/02-legacy-enterprise`, or `cd scenarios/03-healthcare-data-broker`).
 2. Boot the vulnerable infrastructure: `docker compose up -d`
 3. Use the provided `audit_guide.md` in each folder to learn how to manually uncover the compliance failures.
 4. Tear down the environment when finished: `docker compose down -v`
@@ -17,5 +18,6 @@ This monorepo allows security researchers, compliance auditors, and developers t
 ## Scenario Ports
 *   **01-Fintech-Startup:** API on `8000`, dashboard on `8080`.
 *   **02-Legacy-Enterprise:** API on `3000`, dashboard on `8081`, legacy TLS endpoint on `8443`.
+*   **03-Healthcare-Data-Broker:** Broker API on `5000`, dashboard on `8082`, Elasticsearch on `9200`.
 
 **Warning:** These environments are highly insecure by design. Do not deploy them on internet-facing production servers.

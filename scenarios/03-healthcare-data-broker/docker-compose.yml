@@ -1,0 +1,67 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.16
+    container_name: auditable_healthcare_es
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - bootstrap.memory_lock=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.16
+    container_name: auditable_healthcare_ls
+    environment:
+      - LS_JAVA_OPTS=-Xms256m -Xmx256m
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+    depends_on:
+      - elasticsearch
+
+  healthcare-broker:
+    image: python:3.11-slim
+    container_name: auditable_healthcare_api
+    user: root  # INTENTIONAL FLAW 1: Public-facing app runs as root
+    volumes:
+      - ./src:/app
+      - ./logs:/app/logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # INTENTIONAL FLAW 2: Exposed Docker socket
+    working_dir: /app
+    environment:
+      - PORT=5000
+      - LOGSTASH_URL=http://logstash:8080
+      - WEBHOOK_URL=https://missing.example.invalid/report
+      - MASTER_BYPASS_TOKEN=CERTIN_MASTER_BYPASS_2026
+    ports:
+      - "5000:5000"
+    command: >
+      sh -c "pip install -r requirements.txt && python app.py"
+    depends_on:
+      - logstash
+
+  healthcare-dashboard:
+    image: nginx:alpine
+    container_name: auditable_healthcare_web
+    ports:
+      - "8082:80"
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro
+    depends_on:
+      - healthcare-broker
+
+  traffic-simulator:
+    image: python:3.11-slim
+    container_name: auditable_healthcare_sim
+    volumes:
+      - ./simulator:/app
+    working_dir: /app
+    environment:
+      - BROKER_URL=http://healthcare-broker:5000
+    command: >
+      sh -c "pip install requests && python sim.py"
+    depends_on:
+      - healthcare-broker

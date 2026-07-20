@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthNet Broker Dashboard</title>
+    <style>
+        :root {
+            --bg: #07111f;
+            --panel: rgba(10, 20, 36, 0.92);
+            --line: rgba(80, 170, 255, 0.18);
+            --text: #e9f2ff;
+            --muted: #8ea4c9;
+            --accent: #68d5ff;
+            --warn: #ff9f6e;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(104, 213, 255, 0.18), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(255, 159, 110, 0.16), transparent 28%),
+                linear-gradient(135deg, #04101d, #07111f 45%, #0d1730);
+        }
+        .shell { max-width: 1180px; margin: 0 auto; padding: 28px; }
+        .hero {
+            display: flex; justify-content: space-between; gap: 20px; align-items: center;
+            border: 1px solid var(--line); border-radius: 20px; padding: 22px;
+            background: var(--panel); backdrop-filter: blur(10px); margin-bottom: 22px;
+        }
+        .hero h1 { margin: 0; font-size: 1.8rem; }
+        .hero p { margin: 8px 0 0; color: var(--muted); }
+        .badge {
+            border: 1px solid rgba(104, 213, 255, 0.24); color: var(--accent);
+            border-radius: 999px; padding: 10px 14px; white-space: nowrap;
+        }
+        .grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px; }
+        .card {
+            background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+            padding: 20px; box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+        }
+        .cta {
+            border: 0; border-radius: 12px; padding: 12px 16px; margin-right: 10px;
+            font-weight: 700; cursor: pointer; color: #04101d;
+            background: linear-gradient(135deg, var(--accent), #7a93ff);
+        }
+        .cta.secondary { background: linear-gradient(135deg, var(--warn), #ffc97a); }
+        .note { color: var(--muted); line-height: 1.55; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; display: none; }
+        th, td { border-bottom: 1px solid rgba(142, 164, 201, 0.16); padding: 12px; text-align: left; }
+        th { color: #cae8ff; background: rgba(255, 255, 255, 0.03); }
+        .metric {
+            padding: 14px; border-radius: 14px; border: 1px solid rgba(104, 213, 255, 0.14);
+            background: rgba(255, 255, 255, 0.03); margin-bottom: 12px;
+        }
+        .metric strong { display: block; margin-bottom: 6px; color: var(--warn); }
+        .metric span { color: var(--muted); }
+        code { color: #d5f4ff; }
+        @media (max-width: 900px) { .grid, .hero { grid-template-columns: 1fr; flex-direction: column; align-items: flex-start; } }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <div class="hero">
+            <div>
+                <h1>HealthNet Broker Dashboard</h1>
+                <p>Telemetry intake, breach handling, and webhook escalation overview.</p>
+            </div>
+            <div class="badge">Webhook path: disconnected by design</div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Patient Records</h2>
+                <p class="note">The dashboard uses a static bypass token in client-side code and can export raw patient records directly from the broker API.</p>
+                <button class="cta" onclick="loadPatients()">Load Patient Records</button>
+                <button class="cta secondary" onclick="reportBreach()">Simulate Breach</button>
+                <table id="patientTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>MRN</th>
+                            <th>Diagnosis</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patientBody"></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Control Surface</h2>
+                <div class="metric">
+                    <strong>Container Escape Risk</strong>
+                    <span>Public-facing service mounts the Docker socket read-only.</span>
+                </div>
+                <div class="metric">
+                    <strong>CERT-In Reporting</strong>
+                    <span>Breach events are queued locally, but webhook delivery is disconnected.</span>
+                </div>
+                <div class="metric">
+                    <strong>Log Pipeline</strong>
+                    <span>Telemetry is forwarded into the ELK stack for continuous auditability.</span>
+                </div>
+                <div class="metric">
+                    <strong>Client Secret</strong>
+                    <span>Inspect the source and find <code>CERTIN_MASTER_BYPASS_2026</code>.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // INTENTIONAL FLAW 3: Hardcoded master bypass token in browser JavaScript.
+        const API_TOKEN = 'CERTIN_MASTER_BYPASS_2026';
+        const BASE_URL = 'http://localhost:5000';
+
+        async function loadPatients() {
+            const response = await fetch(`${BASE_URL}/api/patients`, {
+                headers: { 'Authorization': `Bearer ${API_TOKEN}` }
+            });
+            if (!response.ok) {
+                alert('Access denied.');
+                return;
+            }
+            const result = await response.json();
+            const body = document.getElementById('patientBody');
+            body.innerHTML = '';
+            result.data.forEach((patient) => {
+                body.innerHTML += `<tr><td>${patient.name}</td><td>${patient.mrn}</td><td>${patient.diagnosis}</td><td>${patient.phone}</td></tr>`;
+            });
+            document.getElementById('patientTable').style.display = 'table';
+        }
+
+        async function reportBreach() {
+            const response = await fetch(`${BASE_URL}/api/breach`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${API_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    incident: 'medical-telemetry-delay',
+                    severity: 'high',
+                    webhook: 'disconnected'
+                })
+            });
+            const result = await response.json();
+            alert(`Breach report state: ${result.webhook_state}`);
+        }
+    </script>
+</body>
+</html>
