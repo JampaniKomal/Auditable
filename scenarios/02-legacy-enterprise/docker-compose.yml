@@ -1,0 +1,72 @@
+services:
+  # The Legacy MySQL Backend
+  mysql-db:
+    image: mysql:5.7
+    container_name: auditable_legacy_db
+    user: root  # INTENTIONAL FLAW 1: Database container runs with elevated privileges
+    environment:
+      - MYSQL_DATABASE=legacy_bank
+      - MYSQL_ROOT_PASSWORD=plaintextroot
+      - MYSQL_USER=auditor
+      - MYSQL_PASSWORD=auditorpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data:/var/lib/mysql  # INTENTIONAL FLAW 2: Unencrypted host volume for regulated data
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -pplaintextroot --silent"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+  # The Monolithic Legacy API
+  legacy-api:
+    image: node:18-alpine
+    container_name: auditable_legacy_api
+    user: root  # INTENTIONAL FLAW 3: Running application as root
+    volumes:
+      - ./src:/app
+      - ./logs:/app/logs
+    working_dir: /app
+    environment:
+      - DB_HOST=mysql-db
+      - DB_PORT=3306
+      - DB_NAME=legacy_bank
+      - DB_USER=root
+      - DB_PASS=plaintextroot
+      - LEGACY_BACKDOOR_TOKEN=LEGACY_MASTER_OVERRIDE_2026
+    ports:
+      - "3000:3000"
+    command: >
+      sh -c "npm install && node server.js"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+
+  # The Public-Facing Website
+  legacy-portal:
+    build:
+      context: ./nginx
+    container_name: auditable_legacy_web
+    ports:
+      - "8081:80"
+      - "8443:443"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - legacy-api
+
+  # The Employee Traffic Simulator
+  traffic-simulator:
+    image: python:3.11-slim
+    container_name: auditable_legacy_sim
+    volumes:
+      - ./simulator:/app
+      - ./logs:/logs
+    working_dir: /app
+    environment:
+      - API_BASE_URL=http://legacy-api:3000
+    command: >
+      sh -c "pip install requests && python sim.py"
+    depends_on:
+      - legacy-api

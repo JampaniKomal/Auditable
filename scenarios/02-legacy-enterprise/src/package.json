@@ -1,0 +1,15 @@
+{
+  "name": "auditable-legacy-enterprise",
+  "version": "1.0.0",
+  "description": "Intentionally vulnerable legacy enterprise API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "2.8.5",
+    "express": "4.18.2",
+    "mysql2": "3.11.2",
+    "winston": "3.11.0"
+  }
+}

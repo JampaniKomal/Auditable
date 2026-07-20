@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legacy Enterprise | Finance Operations Portal</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0b1020;
+            --panel: rgba(16, 24, 48, 0.92);
+            --line: rgba(120, 155, 255, 0.22);
+            --accent: #78d0ff;
+            --accent-2: #f7b267;
+            --text: #ecf2ff;
+            --muted: #9ab0d1;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(120, 208, 255, 0.18), transparent 32%),
+                radial-gradient(circle at bottom right, rgba(247, 178, 103, 0.14), transparent 28%),
+                linear-gradient(135deg, #050814, #0b1020 45%, #11182c);
+        }
+        .shell {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 28px;
+        }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding: 18px 22px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: rgba(6, 10, 20, 0.68);
+            backdrop-filter: blur(10px);
+        }
+        .brand h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 0.04em;
+        }
+        .brand p, .status, .hint {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+        .status {
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(120, 208, 255, 0.3);
+            color: var(--accent);
+            white-space: nowrap;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 20px;
+        }
+        .card {
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: var(--panel);
+            padding: 22px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+        }
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        .card p { color: var(--muted); line-height: 1.55; }
+        .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), #5a7bff);
+            color: #05101f;
+            padding: 12px 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .cta:hover { filter: brightness(1.05); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            display: none;
+            overflow: hidden;
+            border-radius: 14px;
+        }
+        th, td {
+            border-bottom: 1px solid rgba(120, 155, 255, 0.14);
+            padding: 12px;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+        th {
+            color: #c8dcff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .metric {
+            margin-bottom: 14px;
+            padding: 16px;
+            border: 1px solid rgba(120, 208, 255, 0.16);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .metric strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            color: var(--accent-2);
+        }
+        .metric span { color: var(--muted); }
+        .footnote { margin-top: 16px; color: var(--muted); font-size: 0.9rem; }
+        code { color: #bde3ff; }
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+            .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <div class="topbar">
+            <div class="brand">
+                <h1>Legacy Enterprise Finance Operations Portal</h1>
+                <p>Customer reconciliation and employee finance workflows.</p>
+            </div>
+            <div class="status">TLS 1.0 enabled for compatibility</div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Employee Ledger</h2>
+                <p>Load sensitive employee records from the legacy backend. The portal reuses a universal administrative token baked directly into the client bundle.</p>
+                <button class="cta" onclick="loadLedger()">Load Ledger</button>
+                <table id="ledgerTable">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Account Number</th>
+                            <th>PAN</th>
+                            <th>Temp Password</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ledgerBody"></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Control Room</h2>
+                <div class="metric">
+                    <strong>Identity Layer</strong>
+                    <span>Static backdoor token with no rotation policy.</span>
+                </div>
+                <div class="metric">
+                    <strong>Transport Layer</strong>
+                    <span>Deprecated TLS protocol support intentionally left enabled.</span>
+                </div>
+                <div class="metric">
+                    <strong>Telemetry</strong>
+                    <span>Raw audit logs are written to a shared host directory.</span>
+                </div>
+                <div class="footnote">
+                    Open source view and inspect <code>LEGACY_MASTER_OVERRIDE_2026</code> in the page source.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // INTENTIONAL FLAW 4: Hardcoded client-side secret exposed in the browser bundle.
+        const API_TOKEN = 'LEGACY_MASTER_OVERRIDE_2026';
+
+        async function loadLedger() {
+            try {
+                const response = await fetch('/api/ledger', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${API_TOKEN}`
+                    }
+                });
+
+                if (!response.ok) {
+                    alert('Access denied or backend unavailable.');
+                    return;
+                }
+
+                const result = await response.json();
+                const body = document.getElementById('ledgerBody');
+                const table = document.getElementById('ledgerTable');
+                body.innerHTML = '';
+
+                result.data.forEach((row) => {
+                    body.innerHTML += `<tr><td>${row.name}</td><td>${row.account}</td><td>${row.pan}</td><td>${row.password}</td></tr>`;
+                });
+
+                table.style.display = 'table';
+            } catch (error) {
+                console.error(error);
+                alert('Failed to contact the legacy backend.');
+            }
+        }
+    </script>
+</body>
+</html>
