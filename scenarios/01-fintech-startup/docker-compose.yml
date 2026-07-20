@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # The Mock Python Employee & User Portal
+  employee-portal:
+    image: python:3.11-slim
+    container_name: auditable_fintech_api
+    user: root  # INTENTIONAL FLAW 1: Running as root (Violates ISO 27001 Least Privilege)
+    volumes:
+      - ./src:/app
+    working_dir: /app
+    environment:
+      - DB_HOST=postgres-db
+      - DB_NAME=fintech_vault
+      - DB_USER=admin
+      - DB_PASS=supersecretplaintext  # INTENTIONAL FLAW 2: Hardcoded plaintext secrets
+    ports:
+      - "8000:8000"
+    command: >
+      bash -c "pip install -r requirements.txt && python api.py"
+    depends_on:
+      - postgres-db
+
+  # The Target Database
+  postgres-db:
+    image: postgres:15
+    container_name: auditable_fintech_db
+    environment:
+      - POSTGRES_DB=fintech_vault
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=supersecretplaintext
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data  # INTENTIONAL FLAW 3: Unencrypted local volume (Violates DPDPA)

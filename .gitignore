@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Docker / Database Data (Crucial so you don't commit the live fake DB)
+scenarios/01-fintech-startup/data/
