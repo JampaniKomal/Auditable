@@ -15,3 +15,7 @@ This environment simulates a production financial infrastructure containing crit
 ### 3. Basic Container Hardening (CIS Benchmarks / Least Privilege)
 *   **The Finding:** The configuration declaration utilizes `user: root` inside the runtime environment manifest.
 *   **The Impact:** Any runtime compromise allowing arbitrary code execution instantly inherits root administrative space capabilities on the host node instance.
+
+### 4. Client-Side Secret Exposure (OWASP Top 10 / ISO 27001)
+*   **The Finding:** Open the dashboard at `http://localhost:8080`, inspect the page source, and locate the hardcoded `MASTER_BACKDOOR_KEY_2026` token inside the JavaScript fetch logic.
+*   **The Impact:** Exposing authorization tokens in client-side code destroys the trust boundary and gives any user the ability to replay the administrative request.

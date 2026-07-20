@@ -38,3 +38,26 @@ services:
       interval: 3s
       timeout: 3s
       retries: 10
+
+  # The Public-Facing Website (Frontend)
+  employee-dashboard:
+    image: nginx:alpine
+    container_name: auditable_fintech_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - employee-portal
+
+  # The Employee Simulator (Generates continuous logs)
+  traffic-simulator:
+    image: python:3.11-slim
+    container_name: auditable_fintech_sim
+    volumes:
+      - ./simulator:/app
+    working_dir: /app
+    command: >
+      bash -c "pip install requests && python sim.py"
+    depends_on:
+      - employee-portal

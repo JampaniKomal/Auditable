@@ -4,6 +4,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import psycopg2
 from fastapi import FastAPI, HTTPException, Header
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 # Setup dual logging: to stdout and a physical file for auditors to scrape
@@ -22,6 +23,15 @@ logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
 app = FastAPI(title="Delta Fintech Internal API")
+
+# FLAW (Config): Excessively permissive CORS policy allowing any origin
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_NAME = os.getenv("DB_NAME", "fintech_vault")
@@ -51,7 +61,8 @@ def initialize_database():
             INSERT INTO users (full_name, aadhaar_number, plaintext_password)
             VALUES 
             ('Rajesh Kumar', '123456789012', 'password123'),
-            ('Priya Sharma', '987654321098', 'admin2026')
+            ('Priya Sharma', '987654321098', 'admin2026'),
+            ('Amit Patel', '456789123012', 'qwerty2026')
         """)
     conn.commit()
     cur.close()
@@ -77,7 +88,7 @@ def get_users(authorization: str = Header(None)):
     conn.close()
     
     response_data = [{"name": u[0], "aadhaar": u[1], "password": u[2]} for u in users]
-    # FLAW 5: Leaking raw, unmasked PII and credentials directly to the log file (Violates DPDPA)
+    # FLAW: Leaking raw, unmasked PII and credentials directly to the log file (Violates DPDPA)
     logger.info(f"Authorized PII Export executed. Raw payload dumped to disk: {response_data}")
     return {"status": "success", "data": response_data}
 
