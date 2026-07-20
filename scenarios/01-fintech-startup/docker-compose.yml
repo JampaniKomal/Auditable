@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # The Mock Python Employee & User Portal
   employee-portal:
@@ -8,6 +6,7 @@ services:
     user: root  # INTENTIONAL FLAW 1: Running as root (Violates ISO 27001 Least Privilege)
     volumes:
       - ./src:/app
+      - ./logs:/app/logs  # Maps logs to host so auditing engines can scan the raw files
     working_dir: /app
     environment:
       - DB_HOST=postgres-db
@@ -19,7 +18,8 @@ services:
     command: >
       bash -c "pip install -r requirements.txt && python api.py"
     depends_on:
-      - postgres-db
+      postgres-db:
+        condition: service_healthy  # Fixes the startup race condition completely
 
   # The Target Database
   postgres-db:
@@ -33,3 +33,8 @@ services:
       - "5432:5432"
     volumes:
       - ./data:/var/lib/postgresql/data  # INTENTIONAL FLAW 3: Unencrypted local volume (Violates DPDPA)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d fintech_vault"]
+      interval: 3s
+      timeout: 3s
+      retries: 10

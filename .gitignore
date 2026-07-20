@@ -12,3 +12,5 @@ ENV/
 
 # Docker / Database Data (Crucial so you don't commit the live fake DB)
 scenarios/01-fintech-startup/data/
+scenarios/01-fintech-startup/logs/*
+!scenarios/01-fintech-startup/logs/.gitkeep
