@@ -4,6 +4,8 @@ Auditable is an open-source Governance, Risk, and Compliance training lab for lo
 
 The goal of the project is practical training: reproduce realistic configuration drift, identify policy violations, and validate automated or manual audit workflows against known-bad systems.
 
+Auditable is the target environment layer of the overall project. TraceState is the separate auditing engine that scans these scenarios and records findings in an immutable ledger.
+
 ## What’s Included
 
 - Scenario 01: Fintech Startup
@@ -45,6 +47,7 @@ Each scenario is isolated and documented with its own deployment instructions an
 
 - License: MIT
 - Contributions: see [CONTRIBUTING.md](CONTRIBUTING.md)
+- Community expectations: see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - Security disclosures: see [SECURITY.md](SECURITY.md)
 
 ## Responsible Use
