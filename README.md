@@ -1,10 +1,10 @@
 # Auditable
 
-Auditable is an open-source Governance, Risk, and Compliance training lab for local security and compliance practice. It provides intentionally vulnerable enterprise environments that can be deployed with Docker Compose and audited with tools such as TraceState.
+Auditable is an open-source Governance, Risk, and Compliance training lab for local security and compliance practice. It provides intentionally vulnerable enterprise environments that can be deployed with Docker Compose and audited manually or with separate companion tooling such as TraceState.
 
 The goal of the project is practical training: reproduce realistic configuration drift, identify policy violations, and validate automated or manual audit workflows against known-bad systems.
 
-Auditable is the target environment layer of the overall project. TraceState is the separate auditing engine that scans these scenarios and records findings in an immutable ledger.
+Auditable is its own standalone target-environment repository. TraceState is a separate project that can be used alongside it if you want to explore automated compliance scanning and immutable audit ledgers.
 
 ## What’s Included
 
