@@ -4,6 +4,8 @@ Auditable is an open-source Governance, Risk, and Compliance training lab for lo
 
 The goal of the project is practical training: reproduce realistic configuration drift, identify policy violations, and validate audit workflows against known-bad systems. Every finding documented in this repository was independently reproduced end-to-end while building it — not just written down and assumed correct (see "How this was verified" below).
 
+Audit it two ways: manually, the way a GRC analyst actually would (this repo's own `audit_guide.md` files document that process), and with automation, using [TraceState](https://github.com/JampaniKomal/TraceState) — a companion policy-as-code engine whose ruleset is written against these exact three scenarios. TraceState finds 30 of the violations across all three scenarios in under two seconds; it won't tell you a finding is *exploitable* (that judgment is still the point of the manual audit), but it's a real demonstration of how much repetitive audit ground a scanner can cover automatically.
+
 ## What's Included
 
 - Scenario 01: Fintech Startup
