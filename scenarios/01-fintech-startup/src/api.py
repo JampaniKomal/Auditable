@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+from contextlib import asynccontextmanager
 from logging.handlers import RotatingFileHandler
 import psycopg2
 from fastapi import FastAPI, HTTPException, Header
@@ -22,7 +23,13 @@ logger.setLevel(logging.INFO)
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
-app = FastAPI(title="Delta Fintech Internal API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    initialize_database()
+    yield
+
+
+app = FastAPI(title="Delta Fintech Internal API", lifespan=lifespan)
 
 # FLAW (Config): Excessively permissive CORS policy allowing any origin
 app.add_middleware(
@@ -68,10 +75,6 @@ def initialize_database():
     cur.close()
     conn.close()
     logger.info("Database initialized successfully.")
-
-@app.on_event("startup")
-def startup_event():
-    initialize_database()
 
 @app.get("/api/users")
 def get_users(authorization: str = Header(None)):

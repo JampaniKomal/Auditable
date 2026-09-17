@@ -15,11 +15,12 @@ Auditable is a deliberately insecure training repository. The vulnerabilities in
 
 ## Reporting a Problem
 
-If you find an unintended issue in the repository, open an issue or contact the maintainers with:
+If you find an unintended issue in the repository, open an issue or email
+jampanikomal2005@gmail.com with:
 
 - Scenario name
 - Exact file or command
 - Reproduction steps
 - Expected versus actual result
 
-For urgent repository safety concerns, prefer a private disclosure path rather than a public issue.
+For urgent repository safety concerns, prefer that private email over a public issue.
